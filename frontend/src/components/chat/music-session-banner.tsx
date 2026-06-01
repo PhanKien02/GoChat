@@ -6,9 +6,9 @@ import { users } from "@/lib/data";
 
 export function MusicSessionBanner({ conversationId }: { conversationId: string }) {
   const { conversations, toggleMusicPlay, endMusicSession } = useChatStore();
-  const conversation = conversations.find(c => c.id === conversationId);
+  const conversation = conversations.find(c => c._id === conversationId);
   const musicSession = conversation?.musicSession;
-  
+
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -27,17 +27,17 @@ export function MusicSessionBanner({ conversationId }: { conversationId: string 
   if (!musicSession) return null;
 
   // Mock listeners avatars
-  const listeningUsers = users.filter(u => musicSession.listeners.includes(u.id));
+  const listeningUsers = users.filter(u => musicSession.listeners.includes(u._id));
 
   return (
     <div className="mx-4 mt-4 bg-linear-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-4 shadow-sm relative overflow-hidden group animate-in slide-in-from-top-4 duration-500">
       {/* Background glow */}
       <div className="absolute inset-0 bg-linear-to-r from-indigo-500/5 to-pink-500/5 backdrop-blur-md -z-10"></div>
-      
+
       {/* Progress Bar */}
       <div className="absolute bottom-0 left-0 h-1 bg-black/5 dark:bg-white/10 w-full">
-        <div 
-          className="h-full bg-linear-to-r from-indigo-500 to-pink-500 transition-all duration-1000 ease-linear" 
+        <div
+          className="h-full bg-linear-to-r from-indigo-500 to-pink-500 transition-all duration-1000 ease-linear"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -69,7 +69,7 @@ export function MusicSessionBanner({ conversationId }: { conversationId: string 
         {/* Listeners Avatars */}
         <div className="hidden sm:flex items-center -space-x-2 mr-4">
           {listeningUsers.map((user, i) => (
-            <Avatar key={user.id} className="h-8 w-8 border-2 border-background shadow-sm" style={{ zIndex: 10 - i }}>
+            <Avatar key={user._id} className="h-8 w-8 border-2 border-background shadow-sm" style={{ zIndex: 10 - i }}>
               <AvatarImage src={user.avatar} />
               <AvatarFallback>{user.username[0]}</AvatarFallback>
             </Avatar>
@@ -81,13 +81,13 @@ export function MusicSessionBanner({ conversationId }: { conversationId: string 
 
         {/* Controls */}
         <div className="flex items-center gap-2 shrink-0">
-          <button 
+          <button
             onClick={() => toggleMusicPlay(conversationId)}
             className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:scale-105 active:scale-95 transition-all"
           >
             {musicSession.isPlaying ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-0.5" />}
           </button>
-          <button 
+          <button
             onClick={() => endMusicSession(conversationId)}
             className="w-10 h-10 rounded-full bg-muted/50 text-muted-foreground flex items-center justify-center hover:bg-red-500/10 hover:text-red-500 transition-all"
           >
@@ -96,7 +96,8 @@ export function MusicSessionBanner({ conversationId }: { conversationId: string 
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes music-bar {
           0% { transform: scaleY(0.3); }
           100% { transform: scaleY(1); }

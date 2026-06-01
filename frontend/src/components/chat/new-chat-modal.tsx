@@ -18,15 +18,15 @@ export function NewChatModal() {
   if (!isNewChatModalOpen || !currentUser) return null;
 
   // Filter out the current user and search query
-  const availableUsers = users.filter(u => 
-    u.id !== currentUser.id && 
+  const availableUsers = users.filter(u =>
+    u._id !== currentUser._id &&
     u.username.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const toggleUserSelection = (user: User) => {
-    setSelectedUsers(prev => 
-      prev.some(u => u.id === user.id) 
-        ? prev.filter(u => u.id !== user.id)
+    setSelectedUsers(prev =>
+      prev.some(u => u._id === user._id)
+        ? prev.filter(u => u._id !== user._id)
         : [...prev, user]
     );
   };
@@ -48,7 +48,7 @@ export function NewChatModal() {
   return (
     <Dialog open={isNewChatModalOpen} onOpenChange={handleClose}>
       <DialogContent showCloseButton={false} className="sm:max-w-[460px] p-0 overflow-hidden bg-card rounded-2xl shadow-2xl border border-border">
-        
+
         {/* Header */}
         <div className="p-4 border-b border-border flex justify-between items-center bg-muted/20">
           <h2 className="font-semibold text-lg">New Message</h2>
@@ -61,7 +61,7 @@ export function NewChatModal() {
         {selectedUsers.length > 0 && (
           <div className="p-3 border-b border-border flex flex-wrap gap-2 max-h-[104px] overflow-y-auto">
             {selectedUsers.map(u => (
-              <div key={u.id} className="flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-full text-sm font-medium animate-in zoom-in-95 duration-200">
+              <div key={u._id} className="flex items-center gap-1.5 bg-primary/10 text-primary px-2.5 py-1 rounded-full text-sm font-medium animate-in zoom-in-95 duration-200">
                 <Avatar className="h-4 w-4">
                   <AvatarImage src={u.avatar} />
                 </Avatar>
@@ -78,10 +78,10 @@ export function NewChatModal() {
         <div className="p-3 border-b border-border">
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input 
+            <Input
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search people..." 
+              placeholder="Search people..."
               className="pl-9 bg-muted/50 border-transparent focus-visible:ring-1 focus-visible:ring-primary shadow-none h-9"
               autoFocus
             />
@@ -96,10 +96,10 @@ export function NewChatModal() {
             </div>
           ) : (
             availableUsers.map(user => {
-              const isSelected = selectedUsers.some(u => u.id === user.id);
+              const isSelected = selectedUsers.some(u => u._id === user._id);
               return (
                 <button
-                  key={user.id}
+                  key={user._id}
                   onClick={() => toggleUserSelection(user)}
                   className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all mb-1 ${isSelected ? "bg-muted/50" : "hover:bg-muted/30"}`}
                 >
@@ -124,8 +124,8 @@ export function NewChatModal() {
 
         {/* Footer */}
         <div className="p-4 border-t border-border bg-muted/10 flex justify-end">
-          <Button 
-            onClick={handleCreate} 
+          <Button
+            onClick={handleCreate}
             disabled={selectedUsers.length === 0}
             className="w-full sm:w-auto px-8"
           >

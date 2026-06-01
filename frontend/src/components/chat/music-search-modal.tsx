@@ -64,7 +64,7 @@ export function MusicSearchModal() {
           ) : (
             filteredTracks.map(track => (
               <button
-                key={track.id}
+                key={track._id}
                 onClick={() => handleSelectTrack(track)}
                 className="w-full flex items-center gap-4 p-3 rounded-xl transition-all hover:bg-muted/50 group mb-1 text-left"
               >

@@ -10,7 +10,7 @@ export function RightSidebar({ conversation }: { conversation?: Conversation }) 
 
   if (!isRightSidebarOpen || !conversation || !currentUser) return null;
 
-  const otherUser = conversation.participants.find(p => p.id !== currentUser.id) || conversation.participants[0];
+  const otherUser = conversation.participants.find(p => p._id !== currentUser._id) || conversation.participants[0];
   const isGroup = conversation.type === "group";
   const title = isGroup ? conversation.participants.map(p => p.username).join(", ") : otherUser.username;
 
@@ -66,7 +66,7 @@ export function RightSidebar({ conversation }: { conversation?: Conversation }) 
             <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider pl-2">Members ({conversation.participants.length})</h4>
             <div className="space-y-1">
               {conversation.participants.map(p => (
-                <div key={p.id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/40 transition-colors cursor-pointer">
+                <div key={p._id} className="flex items-center gap-3 p-2 rounded-xl hover:bg-muted/40 transition-colors cursor-pointer">
                   <Avatar className="h-9 w-9">
                     <AvatarImage src={p.avatar} />
                     <AvatarFallback>{p.username[0]}</AvatarFallback>

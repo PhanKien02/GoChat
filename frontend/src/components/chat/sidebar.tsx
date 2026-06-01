@@ -39,15 +39,15 @@ export function Sidebar() {
 
       <div className="flex-1 overflow-y-auto px-2 space-y-1">
         {conversations.map((conv) => {
-          const otherUser = conv.participants.find(p => p.id !== currentUser.id) || conv.participants[0];
+          const otherUser = conv.participants.find(p => p._id !== currentUser._id) || conv.participants[0];
           const isGroup = conv.type === "group";
           const name = isGroup ? conv.participants.map(p => p.username).join(", ") : otherUser.username;
-          const isActive = conv.id === activeConversationId;
+          const isActive = conv._id === activeConversationId;
 
           return (
             <button
-              key={conv.id}
-              onClick={() => onSelect(conv.id)}
+              key={conv._id}
+              onClick={() => onSelect(conv._id)}
               className={`w-full text-left p-3 rounded-xl flex gap-3 items-center transition-all ${isActive
                 ? "bg-sidebar-accent text-sidebar-accent-foreground"
                 : "hover:bg-sidebar-accent/50 text-muted-foreground hover:text-foreground"

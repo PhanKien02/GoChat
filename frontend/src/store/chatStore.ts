@@ -41,8 +41,8 @@ interface ChatState {
 // Prepare initial messages dictionary from mock data
 const initialMessagesDict: Record<string, Message[]> = {
   "c1": initialMessages,
-  "c2": mockConversations.find(c => c.id === "c2")?.lastMessage ? [mockConversations.find(c => c.id === "c2")!.lastMessage!] : [],
-  "c3": mockConversations.find(c => c.id === "c3")?.lastMessage ? [mockConversations.find(c => c.id === "c3")!.lastMessage!] : [],
+  "c2": mockConversations.find(c => c._id === "c2")?.lastMessage ? [mockConversations.find(c => c._id === "c2")!.lastMessage!] : [],
+  "c3": mockConversations.find(c => c._id === "c3")?.lastMessage ? [mockConversations.find(c => c._id === "c3")!.lastMessage!] : [],
 };
 
 export const useChatStore = create<ChatState>((set) => ({
@@ -67,9 +67,9 @@ export const useChatStore = create<ChatState>((set) => ({
   createConversation: (selectedUsers: User[]) => set((state) => {
     const currentUser = useAuthStore.getState().user;
     if (!currentUser) return state;
-    
+
     const newConversation: Conversation = {
-      id: `c${Date.now()}`,
+      _id: `c${Date.now()}`,
       participants: [currentUser, ...selectedUsers],
       type: selectedUsers.length > 1 ? "group" : "private",
       unreadCount: 0,
@@ -77,9 +77,9 @@ export const useChatStore = create<ChatState>((set) => ({
     };
     return {
       conversations: [newConversation, ...state.conversations],
-      activeConversationId: newConversation.id,
+      activeConversationId: newConversation._id,
       isNewChatModalOpen: false,
-      messages: { ...state.messages, [newConversation.id]: [] }
+      messages: { ...state.messages, [newConversation._id]: [] }
     };
   }),
 
@@ -98,17 +98,17 @@ export const useChatStore = create<ChatState>((set) => ({
   startMusicSession: (conversationId: string, track: Track) => set((state) => {
     const currentUser = useAuthStore.getState().user;
     if (!currentUser) return state;
-    
+
     return {
       conversations: state.conversations.map(c =>
-        c.id === conversationId ? {
+        c._id === conversationId ? {
           ...c,
           musicSession: {
             songTitle: track.title,
             artist: track.artist,
             albumArt: track.albumArt,
             isPlaying: true,
-            listeners: [currentUser.id]
+            listeners: [currentUser._id]
           }
         } : c
       ),
@@ -119,7 +119,7 @@ export const useChatStore = create<ChatState>((set) => ({
 
   toggleMusicPlay: (conversationId: string) => set((state) => ({
     conversations: state.conversations.map(c =>
-      c.id === conversationId && c.musicSession ? {
+      c._id === conversationId && c.musicSession ? {
         ...c,
         musicSession: {
           ...c.musicSession,
@@ -131,7 +131,7 @@ export const useChatStore = create<ChatState>((set) => ({
 
   endMusicSession: (conversationId: string) => set((state) => ({
     conversations: state.conversations.map(c =>
-      c.id === conversationId ? {
+      c._id === conversationId ? {
         ...c,
         musicSession: undefined
       } : c
@@ -143,39 +143,39 @@ export const useChatStore = create<ChatState>((set) => ({
     if (!currentUser) return state;
 
     const newMessage: Message = {
-      id: `m${Date.now()}`,
+      + id: `m${Date.now()}`,
       conversationId,
       sender: currentUser,
-      content,
-      attachments,
-      createdAt: Date.now(),
-      status: "sent"
-    };
+        content,
+        attachments,
+        createdAt: Date.now(),
+          status: "sent"
+  };
 
-    const updatedMessages = {
-      ...state.messages,
-      [conversationId]: [...(state.messages[conversationId] || []), newMessage]
-    };
+  const updatedMessages = {
+    ...state.messages,
+    [conversationId]: [...(state.messages[conversationId] || []), newMessage]
+  };
 
-    const updatedConversations = state.conversations.map(conv => {
-      if (conv.id === conversationId) {
-        return {
-          ...conv,
-          lastMessage: newMessage,
-          updatedAt: newMessage.createdAt
-        };
-      }
-      return conv;
-    });
+  const updatedConversations = state.conversations.map(conv => {
+    if (conv.id === conversationId) {
+      return {
+        ...conv,
+        lastMessage: newMessage,
+        updatedAt: newMessage.createdAt
+      };
+    }
+    return conv;
+  });
 
-    // Sort conversations by updatedAt descending to bubble active chats to top
-    updatedConversations.sort((a, b) => b.updatedAt - a.updatedAt);
+  // Sort conversations by updatedAt descending to bubble active chats to top
+  updatedConversations.sort((a, b) => b.updatedAt - a.updatedAt);
 
-    return {
-      messages: updatedMessages,
-      conversations: updatedConversations
-    };
-  }),
+  return {
+    messages: updatedMessages,
+    conversations: updatedConversations
+  };
+}),
 
   fetchConversations: async () => {
     set({ isLoading: true, error: null });

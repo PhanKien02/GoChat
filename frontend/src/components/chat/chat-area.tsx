@@ -28,11 +28,11 @@ export function ChatArea({ conversation }: ChatAreaProps) {
     );
   }
 
-  const otherUser = conversation.participants.find(p => p.id !== currentUser.id) || conversation.participants[0];
+  const otherUser = conversation.participants.find(p => p._id !== currentUser._id) || conversation.participants[0];
   const isGroup = conversation.type === "group";
   const title = isGroup ? conversation.participants.map(p => p.username).join(", ") : otherUser.username;
 
-  const messages = allMessages[conversation.id] || [];
+  const messages = allMessages[conversation._id] || [];
 
   return (
     <div className="flex-1 flex flex-col bg-background h-full overflow-hidden relative">
@@ -62,7 +62,7 @@ export function ChatArea({ conversation }: ChatAreaProps) {
         <div className="flex items-center gap-3 text-muted-foreground">
           <button className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl"><Phone size={18} /></button>
           <button onClick={() => setVideoCallOpen(true)} className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl"><Video size={18} /></button>
-          <button onClick={() => openMusicSearchModal(conversation.id)} className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl"><Headphones size={18} /></button>
+          <button onClick={() => openMusicSearchModal(conversation._id)} className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl"><Headphones size={18} /></button>
           <div className="w-px h-6 bg-border mx-1"></div>
           <button
             onClick={toggleRightSidebar}
@@ -73,7 +73,7 @@ export function ChatArea({ conversation }: ChatAreaProps) {
         </div>
       </header>
 
-      <MusicSessionBanner conversationId={conversation.id} />
+      <MusicSessionBanner conversationId={conversation._id} />
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-6 scroll-smooth">
@@ -85,11 +85,11 @@ export function ChatArea({ conversation }: ChatAreaProps) {
 
         <div className="flex flex-col gap-4">
           {messages.map((msg, idx) => {
-            const isMe = msg.sender.id === currentUser.id;
-            const showAvatar = !isMe && (idx === 0 || messages[idx - 1].sender.id !== msg.sender.id);
+            const isMe = msg.sender._id === currentUser._id;
+            const showAvatar = !isMe && (idx === 0 || messages[idx - 1].sender._id !== msg.sender._id);
 
             return (
-              <div key={msg.id} className={`flex gap-3 max-w-[80%] ${isMe ? "self-end flex-row-reverse" : "self-start"}`}>
+              <div key={msg.+ id} className={`flex gap-3 max-w-[80%] ${isMe ? "self-end flex-row-reverse" : "self-start"}`}>
                 {!isMe ? (
                   <div className="w-8 shrink-0">
                     {showAvatar && (
@@ -112,14 +112,14 @@ export function ChatArea({ conversation }: ChatAreaProps) {
                       {msg.attachments.map(att => {
                         if (att.type === "image") {
                           return <Image
-                            key={att.id} src={att.url} alt="attachment" className="rounded-xl max-w-full max-h-64 object-cover shadow-sm border border-border" />
+                            key={att._id} src={att.url} alt="attachment" className="rounded-xl max-w-full max-h-64 object-cover shadow-sm border border-border" />
                         }
                         if (att.type === "video") {
-                          return <video key={att.id} src={att.url} controls className="rounded-xl max-w-full max-h-64 object-cover shadow-sm border border-border" />
+                          return <video key={att._id} src={att.url} controls className="rounded-xl max-w-full max-h-64 object-cover shadow-sm border border-border" />
                         }
                         if (att.type === "audio") {
                           return (
-                            <div key={att.id} className={`flex items-center gap-3 p-3 rounded-xl border shadow-sm w-full ${isMe ? "bg-primary/20 border-primary/30" : "bg-sidebar border-border"}`}>
+                            <div key={att._id} className={`flex items-center gap-3 p-3 rounded-xl border shadow-sm w-full ${isMe ? "bg-primary/20 border-primary/30" : "bg-sidebar border-border"}`}>
                               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                                 <Music size={18} className={isMe ? "text-primary" : "text-muted-foreground"} />
                               </div>
@@ -128,7 +128,7 @@ export function ChatArea({ conversation }: ChatAreaProps) {
                           )
                         }
                         return (
-                          <div key={att.id} className={`flex items-center gap-3 p-3 rounded-xl border shadow-sm w-full ${isMe ? "bg-primary text-primary-foreground border-primary" : "bg-sidebar text-foreground border-border"}`}>
+                          <div key={att._id} className={`flex items-center gap-3 p-3 rounded-xl border shadow-sm w-full ${isMe ? "bg-primary text-primary-foreground border-primary" : "bg-sidebar text-foreground border-border"}`}>
                             <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isMe ? "bg-black/20" : "bg-muted"}`}>
                               <FileText size={20} />
                             </div>

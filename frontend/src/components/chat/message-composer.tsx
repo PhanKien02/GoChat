@@ -66,13 +66,13 @@ export function MessageComposer() {
   };
 
   const handleRemoveAttachment = (id: string) => {
-    setStagedAttachments(prev => prev.filter(a => a.id !== id));
+    setStagedAttachments(prev => prev.filter(a => a._id !== id));
   };
 
   const toggleRecording = () => {
     if (isRecording) {
       const mockAudio: Attachment = {
-        id: `att_${Date.now()}`,
+        _id: `att_${Date.now()}`,
         messageId: "",
         url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         type: "audio",
@@ -104,7 +104,7 @@ export function MessageComposer() {
       {stagedAttachments.length > 0 && (
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-2">
           {stagedAttachments.map((att) => (
-            <div key={att.id} className="relative group shrink-0 w-16 h-16 rounded-xl border border-border bg-muted/50 overflow-hidden flex items-center justify-center">
+            <div key={att._id} className="relative group shrink-0 w-16 h-16 rounded-xl border border-border bg-muted/50 overflow-hidden flex items-center justify-center">
               {att.type === "image" ? (
                 <Image
                   src={att.url}
@@ -121,7 +121,7 @@ export function MessageComposer() {
                 <FileText size={24} className="text-muted-foreground" />
               )}
               <button
-                onClick={() => handleRemoveAttachment(att.id)}
+                onClick={() => handleRemoveAttachment(att._id)}
                 className="absolute -top-1 -right-1 bg-black/60 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <X size={12} />

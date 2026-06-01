@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  _id: string;
   username: string;
   email?: string;
   password?: string;
@@ -16,14 +16,14 @@ export interface User {
 }
 
 export interface Track {
-  id: string;
+  _id: string;
   title: string;
   artist: string;
   albumArt: string;
 }
 
 export interface Attachment {
-  id: string;
+  _id: string;
   messageId: string;
   type: "image" | "file" | "video" | "document" | "audio" | "other";
   url: string;
@@ -32,7 +32,7 @@ export interface Attachment {
 }
 
 export interface Message {
-  id: string;
+  _id: string;
   conversationId: string;
   sender: User;
   attachments?: Attachment[];
@@ -43,7 +43,7 @@ export interface Message {
 }
 
 export interface Conversation {
-  id: string;
+  _id: string;
   type: "private" | "group";
   participants: User[];
   lastMessage?: Message;

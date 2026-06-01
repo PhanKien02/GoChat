@@ -18,7 +18,7 @@ export function ChatApp({ initialUser }: { initialUser: User }) {
   }, [initialUser]);
 
   const { conversations, activeConversationId } = useChatStore();
-  const activeConversation = conversations.find(c => c.id === activeConversationId);
+  const activeConversation = conversations.find(c => c._id === activeConversationId);
 
   return (
     <main className="flex h-screen w-full overflow-hidden bg-background text-foreground">
