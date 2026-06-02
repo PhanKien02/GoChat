@@ -28,3 +28,13 @@ func (h *UserHandler) CreateUserHandler(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusCreated, user)
 }
+
+func (h *UserHandler) GetUserHandler(ctx *gin.Context) {
+	id := ctx.Param("id")
+	user, err := h.service.GetUserByID(ctx, id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, user)
+}

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -46,14 +47,31 @@ func (s *userService) CreateUser(ctx context.Context, req *CreateUserRequest) er
 	return s.repo.CreateUser(ctx, userModel)
 }
 func (s *userService) GetUserByID(ctx context.Context, id string) (*UserModel, error) {
-	return s.repo.GetUserByID(ctx, id)
+	userId, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, errors.New("id Không hợp lệ")
+	}
+	user := s.repo.GetUserByID(ctx, userId)
+
+	if user == nil {
+		return nil, errors.New("Không tìm thấy user")
+	}
+	return user, nil
 }
 func (s *userService) GetUserByEmail(ctx context.Context, email string) (*UserModel, error) {
 	return s.repo.GetUserByEmail(ctx, email), nil
 }
 func (s *userService) UpdateUser(ctx context.Context, id string, user *UserModel) error {
-	return s.repo.UpdateUser(ctx, id, user)
+	userId, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("id Không hợp lệ")
+	}
+	return s.repo.UpdateUser(ctx, userId, user)
 }
 func (s *userService) DeleteUser(ctx context.Context, id string) error {
-	return s.repo.DeleteUser(ctx, id)
+	userId, err := bson.ObjectIDFromHex(id)
+	if err != nil {
+		return errors.New("id Không hợp lệ")
+	}
+	return s.repo.DeleteUser(ctx, userId)
 }

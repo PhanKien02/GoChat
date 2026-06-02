@@ -9,10 +9,10 @@ import (
 
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *UserModel) error
-	GetUserByID(ctx context.Context, id string) (*UserModel, error)
+	GetUserByID(ctx context.Context, id bson.ObjectID) *UserModel
 	GetUserByEmail(ctx context.Context, email string) *UserModel
-	UpdateUser(ctx context.Context, id string, user *UserModel) error
-	DeleteUser(ctx context.Context, id string) error
+	UpdateUser(ctx context.Context, id bson.ObjectID, user *UserModel) error
+	DeleteUser(ctx context.Context, id bson.ObjectID) error
 }
 
 type userRepository struct {
@@ -30,13 +30,13 @@ func (r *userRepository) CreateUser(ctx context.Context, user *UserModel) error 
 	_, err := r.users.InsertOne(ctx, user)
 	return err
 }
-func (r *userRepository) GetUserByID(ctx context.Context, id string) (*UserModel, error) {
+func (r *userRepository) GetUserByID(ctx context.Context, id bson.ObjectID) *UserModel {
 	var user UserModel
 
 	if err := r.users.FindOne(ctx, bson.M{"_id": id}).Decode(&user); err != nil {
-		return nil, err
+		return nil
 	}
-	return &user, nil
+	return &user
 }
 func (r *userRepository) GetUserByEmail(ctx context.Context, email string) *UserModel {
 	var user UserModel
@@ -46,11 +46,11 @@ func (r *userRepository) GetUserByEmail(ctx context.Context, email string) *User
 	}
 	return &user
 }
-func (r *userRepository) UpdateUser(ctx context.Context, id string, user *UserModel) error {
+func (r *userRepository) UpdateUser(ctx context.Context, id bson.ObjectID, user *UserModel) error {
 	_, err := r.users.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": user})
 	return err
 }
-func (r *userRepository) DeleteUser(ctx context.Context, id string) error {
+func (r *userRepository) DeleteUser(ctx context.Context, id bson.ObjectID) error {
 	_, err := r.users.DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }
