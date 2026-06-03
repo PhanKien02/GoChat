@@ -1,6 +1,7 @@
 package user
 
 import (
+	"GoChat/shared/helper"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,8 +19,8 @@ func (h *UserHandler) GetUserHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 	user, err := h.service.GetUserByID(ctx, id)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		helper.ErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return
 	}
-	ctx.JSON(http.StatusOK, user)
+	helper.HTTPResponse(ctx, http.StatusOK, "User fetched successfully", user, true)
 }
