@@ -1,14 +1,14 @@
 package user
 
 import (
+	"GoChat/shared/middleware"
+
 	"github.com/gin-gonic/gin"
 )
 
 func UserRoutes(rg *gin.RouterGroup, handler *UserHandler) {
-	// Khởi tạo (DI) riêng cho module user
-
-	// Các API liên quan đến user (ví dụ: /api/users/signup)
 	userGroup := rg.Group("/users")
+	userGroup.Use(middleware.JWTMiddleware())
 	{
 		userGroup.GET("/:id", handler.GetUserHandler)
 	}

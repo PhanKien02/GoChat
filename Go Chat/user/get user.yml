@@ -18,7 +18,9 @@ http:
         "password":"ádjfádfádfád",
         "email":"demo@gmail.com"
       }
-  auth: inherit
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIxZCIsImlhdCI6MTc4MDQ5NjMzOCwidXNlcl9pZCI6IjZhMjAzMDI4NDA4YjU5MDA5ZmMzMjM1NyJ9.zqwcHv5IuesxOWWHyDQOeYoAz0bM9qH2N4W6I9aEm3g
 
 settings:
   encodeUrl: true

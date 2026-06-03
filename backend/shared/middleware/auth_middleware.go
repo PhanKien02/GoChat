@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"GoChat/shared/helper"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +15,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "" {
-			c.JSON(401, gin.H{"error": "missing token"})
+			helper.ErrorResponse(c, http.StatusUnauthorized, "missing token")
 			c.Abort()
 			return
 		}
@@ -22,7 +24,7 @@ func JWTMiddleware() gin.HandlerFunc {
 
 		token, err := ValidateToken(tokenString)
 		if err != nil || !token.Valid {
-			c.JSON(401, gin.H{"error": "invalid token"})
+			helper.ErrorResponse(c, http.StatusUnauthorized, "invalid token")
 			c.Abort()
 			return
 		}
