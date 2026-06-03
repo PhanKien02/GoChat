@@ -1,6 +1,17 @@
 import { Conversation } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Info, Phone, Video, MessageSquare, Check, CheckCheck, Headphones, FileText, Music, Download } from "lucide-react";
+import {
+  Info,
+  Phone,
+  Video,
+  MessageSquare,
+  Check,
+  CheckCheck,
+  Headphones,
+  FileText,
+  Music,
+  Download,
+} from "lucide-react";
 import { MessageComposer } from "./message-composer";
 import { format } from "date-fns";
 import { useChatStore } from "@/store/chatStore";
@@ -13,8 +24,14 @@ interface ChatAreaProps {
 }
 
 export function ChatArea({ conversation }: ChatAreaProps) {
-  const { messages: allMessages, isRightSidebarOpen, toggleRightSidebar, setVideoCallOpen, openMusicSearchModal } = useChatStore();
-  const currentUser = useAuthStore(state => state.user);
+  const {
+    messages: allMessages,
+    isRightSidebarOpen,
+    toggleRightSidebar,
+    setVideoCallOpen,
+    openMusicSearchModal,
+  } = useChatStore();
+  const currentUser = useAuthStore((state) => state.user);
 
   if (!conversation || !currentUser) {
     return (
@@ -22,15 +39,21 @@ export function ChatArea({ conversation }: ChatAreaProps) {
         <div className="w-16 h-16 rounded-full bg-sidebar flex items-center justify-center mb-4">
           <MessageSquare size={32} />
         </div>
-        <h2 className="text-xl font-semibold text-foreground mb-2">No conversation selected</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-2">
+          No conversation selected
+        </h2>
         <p>Choose a chat from the sidebar or start a new one.</p>
       </div>
     );
   }
 
-  const otherUser = conversation.participants.find(p => p._id !== currentUser._id) || conversation.participants[0];
+  const otherUser =
+    conversation.participants.find((p) => p._id !== currentUser._id) ||
+    conversation.participants[0];
   const isGroup = conversation.type === "group";
-  const title = isGroup ? conversation.participants.map(p => p.username).join(", ") : otherUser.username;
+  const title = isGroup
+    ? conversation.participants.map((p) => p.username).join(", ")
+    : otherUser.username;
 
   const messages = allMessages[conversation._id] || [];
 
@@ -50,19 +73,35 @@ export function ChatArea({ conversation }: ChatAreaProps) {
             )}
           </Avatar>
           <div>
-            <h2 className="font-semibold text-foreground leading-tight">{title}</h2>
+            <h2 className="font-semibold text-foreground leading-tight">
+              {title}
+            </h2>
             {!isGroup && (
               <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
-                <span className={`w-2 h-2 rounded-full ${otherUser.online ? "bg-green-500" : "bg-muted"}`}></span>
+                <span
+                  className={`w-2 h-2 rounded-full ${otherUser.online ? "bg-green-500" : "bg-muted"}`}
+                ></span>
                 {otherUser.online ? "Online" : "Offline"}
               </p>
             )}
           </div>
         </div>
         <div className="flex items-center gap-3 text-muted-foreground">
-          <button className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl"><Phone size={18} /></button>
-          <button onClick={() => setVideoCallOpen(true)} className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl"><Video size={18} /></button>
-          <button onClick={() => openMusicSearchModal(conversation._id)} className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl"><Headphones size={18} /></button>
+          <button className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl">
+            <Phone size={18} />
+          </button>
+          <button
+            onClick={() => setVideoCallOpen(true)}
+            className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl"
+          >
+            <Video size={18} />
+          </button>
+          <button
+            onClick={() => openMusicSearchModal(conversation._id)}
+            className="p-2 hover:bg-muted/50 hover:text-foreground transition-colors rounded-xl"
+          >
+            <Headphones size={18} />
+          </button>
           <div className="w-px h-6 bg-border mx-1"></div>
           <button
             onClick={toggleRightSidebar}
@@ -86,88 +125,158 @@ export function ChatArea({ conversation }: ChatAreaProps) {
         <div className="flex flex-col gap-4">
           {messages.map((msg, idx) => {
             const isMe = msg.sender._id === currentUser._id;
-            const showAvatar = !isMe && (idx === 0 || messages[idx - 1].sender._id !== msg.sender._id);
+            const showAvatar =
+              !isMe &&
+              (idx === 0 || messages[idx - 1].sender._id !== msg.sender._id);
 
             return (
-              <div key={msg.+ id} className={`flex gap-3 max-w-[80%] ${isMe ? "self-end flex-row-reverse" : "self-start"}`}>
+              <div
+                key={msg._id}
+                className={`flex gap-3 max-w-[80%] ${isMe ? "self-end flex-row-reverse" : "self-start"}`}
+              >
                 {!isMe ? (
                   <div className="w-8 shrink-0">
                     {showAvatar && (
                       <Avatar className="w-8 h-8">
                         <AvatarImage src={msg.sender.avatar} />
-                        <AvatarFallback>{msg.sender.username.substring(0, 1)}</AvatarFallback>
+                        <AvatarFallback>
+                          {msg.sender.username.substring(0, 1)}
+                        </AvatarFallback>
                       </Avatar>
                     )}
                   </div>
                 ) : null}
 
-                <div className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+                <div
+                  className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
+                >
                   {!isMe && showAvatar && (
-                    <span className="text-xs text-muted-foreground mb-1 ml-1">{msg.sender.username}</span>
+                    <span className="text-xs text-muted-foreground mb-1 ml-1">
+                      {msg.sender.username}
+                    </span>
                   )}
 
                   {/* Attachments */}
                   {msg.attachments && msg.attachments.length > 0 && (
-                    <div className={`flex flex-col gap-2 mb-1.5 w-full max-w-sm ${isMe ? "items-end" : "items-start"}`}>
-                      {msg.attachments.map(att => {
+                    <div
+                      className={`flex flex-col gap-2 mb-1.5 w-full max-w-sm ${isMe ? "items-end" : "items-start"}`}
+                    >
+                      {msg.attachments.map((att) => {
                         if (att.type === "image") {
-                          return <Image
-                            key={att._id} src={att.url} alt="attachment" className="rounded-xl max-w-full max-h-64 object-cover shadow-sm border border-border" />
+                          return (
+                            <Image
+                              key={att._id}
+                              src={att.url}
+                              alt="attachment"
+                              width={48}
+                              height={48}
+                              className="rounded-xl max-w-full max-h-64 object-cover shadow-sm border border-border"
+                            />
+                          );
                         }
                         if (att.type === "video") {
-                          return <video key={att._id} src={att.url} controls className="rounded-xl max-w-full max-h-64 object-cover shadow-sm border border-border" />
+                          return (
+                            <video
+                              key={att._id}
+                              src={att.url}
+                              controls
+                              className="rounded-xl max-w-full max-h-64 object-cover shadow-sm border border-border"
+                            />
+                          );
                         }
                         if (att.type === "audio") {
                           return (
-                            <div key={att._id} className={`flex items-center gap-3 p-3 rounded-xl border shadow-sm w-full ${isMe ? "bg-primary/20 border-primary/30" : "bg-sidebar border-border"}`}>
+                            <div
+                              key={att._id}
+                              className={`flex items-center gap-3 p-3 rounded-xl border shadow-sm w-full ${isMe ? "bg-primary/20 border-primary/30" : "bg-sidebar border-border"}`}
+                            >
                               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                                <Music size={18} className={isMe ? "text-primary" : "text-muted-foreground"} />
+                                <Music
+                                  size={18}
+                                  className={
+                                    isMe
+                                      ? "text-primary"
+                                      : "text-muted-foreground"
+                                  }
+                                />
                               </div>
-                              <audio src={att.url} controls className="h-8 w-full max-w-[200px]" />
+                              <audio
+                                src={att.url}
+                                controls
+                                className="h-8 w-full max-w-[200px]"
+                              />
                             </div>
-                          )
+                          );
                         }
                         return (
-                          <div key={att._id} className={`flex items-center gap-3 p-3 rounded-xl border shadow-sm w-full ${isMe ? "bg-primary text-primary-foreground border-primary" : "bg-sidebar text-foreground border-border"}`}>
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isMe ? "bg-black/20" : "bg-muted"}`}>
+                          <div
+                            key={att._id}
+                            className={`flex items-center gap-3 p-3 rounded-xl border shadow-sm w-full ${isMe ? "bg-primary text-primary-foreground border-primary" : "bg-sidebar text-foreground border-border"}`}
+                          >
+                            <div
+                              className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isMe ? "bg-black/20" : "bg-muted"}`}
+                            >
                               <FileText size={20} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold truncate">{att.filename}</p>
-                              <p className="text-xs opacity-80">{att.size ? (att.size / 1024).toFixed(1) + ' KB' : 'File'}</p>
+                              <p className="text-sm font-semibold truncate">
+                                {att.filename}
+                              </p>
+                              <p className="text-xs opacity-80">
+                                {att.size
+                                  ? (att.size / 1024).toFixed(1) + " KB"
+                                  : "File"}
+                              </p>
                             </div>
-                            <button className={`p-2 shrink-0 rounded-full transition-colors ${isMe ? "hover:bg-black/20" : "hover:bg-muted"}`}>
+                            <button
+                              className={`p-2 shrink-0 rounded-full transition-colors ${isMe ? "hover:bg-black/20" : "hover:bg-muted"}`}
+                            >
                               <Download size={18} />
                             </button>
                           </div>
-                        )
+                        );
                       })}
                     </div>
                   )}
 
                   {msg.content && (
-                    <div className={`px-4 py-2.5 rounded-2xl text-[15px] leading-relaxed shadow-sm ${isMe
-                      ? "bg-primary text-primary-foreground rounded-tr-sm"
-                      : "bg-sidebar border border-border text-foreground rounded-tl-sm"
-                      }`}>
+                    <div
+                      className={`px-4 py-2.5 rounded-2xl text-[15px] leading-relaxed shadow-sm ${
+                        isMe
+                          ? "bg-primary text-primary-foreground rounded-tr-sm"
+                          : "bg-sidebar border border-border text-foreground rounded-tl-sm"
+                      }`}
+                    >
                       {/* Basic Markdown handling for code blocks can be added here, for now simple text */}
                       {msg.content.includes("\n```") ? (
-                        <div dangerouslySetInnerHTML={{ __html: msg.content.replace(/```tsx\n([\s\S]*?)```/g, '<pre class="bg-black/20 p-2 rounded mt-2 text-sm overflow-x-auto border border-white/10"><code>$1</code></pre>') }} />
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: msg.content.replace(
+                              /```tsx\n([\s\S]*?)```/g,
+                              '<pre class="bg-black/20 p-2 rounded mt-2 text-sm overflow-x-auto border border-white/10"><code>$1</code></pre>',
+                            ),
+                          }}
+                        />
                       ) : (
                         <p className="whitespace-pre-wrap">{msg.content}</p>
                       )}
                     </div>
                   )}
 
-                  <div className={`flex items-center gap-1 mt-1 text-[11px] text-muted-foreground ${isMe ? "mr-1" : "ml-1"}`}>
+                  <div
+                    className={`flex items-center gap-1 mt-1 text-[11px] text-muted-foreground ${isMe ? "mr-1" : "ml-1"}`}
+                  >
                     <span>{format(msg.createdAt, "HH:mm")}</span>
-                    {isMe && (
-                      msg.status === "read" ? <CheckCheck size={14} className="text-blue-500" /> : <Check size={14} />
-                    )}
+                    {isMe &&
+                      (msg.status === "read" ? (
+                        <CheckCheck size={14} className="text-blue-500" />
+                      ) : (
+                        <Check size={14} />
+                      ))}
                   </div>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </div>

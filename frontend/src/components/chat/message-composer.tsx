@@ -1,11 +1,42 @@
 import { useState, useRef, useEffect } from "react";
-import { Paperclip, Send, Smile, Mic, Square, X, FileText, Video as VideoIcon, Music } from "lucide-react";
+import {
+  Paperclip,
+  Send,
+  Smile,
+  Mic,
+  Square,
+  X,
+  FileText,
+  Video as VideoIcon,
+  Music,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useChatStore } from "@/store/chatStore";
 import { Attachment } from "@/lib/types";
 import Image from "next/image";
 
-const EMOJIS = ["😀", "😂", "🥺", "😍", "😎", "🤔", "😭", "🥰", "👍", "🔥", "✨", "🎉", "❤️", "💯", "👀", "🙌", "🚀", "💡", "🎶", "🎵"];
+const EMOJIS = [
+  "😀",
+  "😂",
+  "🥺",
+  "😍",
+  "😎",
+  "🤔",
+  "😭",
+  "🥰",
+  "👍",
+  "🔥",
+  "✨",
+  "🎉",
+  "❤️",
+  "💯",
+  "👀",
+  "🙌",
+  "🚀",
+  "💡",
+  "🎶",
+  "🎵",
+];
 
 export function MessageComposer() {
   const [content, setContent] = useState("");
@@ -20,13 +51,23 @@ export function MessageComposer() {
 
   useEffect(() => {
     if (!isRecording) return;
-    const interval = setInterval(() => setRecordingDuration(p => p + 1), 1000);
+    const interval = setInterval(
+      () => setRecordingDuration((p) => p + 1),
+      1000,
+    );
     return () => clearInterval(interval);
   }, [isRecording]);
 
   const handleSend = () => {
-    if ((content.trim() || stagedAttachments.length > 0) && activeConversationId) {
-      sendMessage(content.trim(), activeConversationId, stagedAttachments.length > 0 ? stagedAttachments : undefined);
+    if (
+      (content.trim() || stagedAttachments.length > 0) &&
+      activeConversationId
+    ) {
+      sendMessage(
+        content.trim(),
+        activeConversationId,
+        stagedAttachments.length > 0 ? stagedAttachments : undefined,
+      );
       setContent("");
       setStagedAttachments([]);
       setShowEmojiPicker(false);
@@ -43,30 +84,33 @@ export function MessageComposer() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newAttachments: Attachment[] = Array.from(e.target.files).map(file => {
-        const typeStr = file.type;
-        let type: Attachment["type"] = "file";
-        if (typeStr.startsWith("image/")) type = "image";
-        else if (typeStr.startsWith("video/")) type = "video";
-        else if (typeStr.startsWith("audio/")) type = "audio";
-        else if (typeStr.includes("pdf") || typeStr.includes("document")) type = "document";
+      const newAttachments: Attachment[] = Array.from(e.target.files).map(
+        (file) => {
+          const typeStr = file.type;
+          let type: Attachment["type"] = "file";
+          if (typeStr.startsWith("image/")) type = "image";
+          else if (typeStr.startsWith("video/")) type = "video";
+          else if (typeStr.startsWith("audio/")) type = "audio";
+          else if (typeStr.includes("pdf") || typeStr.includes("document"))
+            type = "document";
 
-        return {
-          id: `att_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          messageId: "",
-          url: URL.createObjectURL(file),
-          type,
-          filename: file.name,
-          size: file.size
-        };
-      });
-      setStagedAttachments(prev => [...prev, ...newAttachments]);
+          return {
+            _id: `att_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            messageId: "",
+            url: URL.createObjectURL(file),
+            type,
+            filename: file.name,
+            size: file.size,
+          };
+        },
+      );
+      setStagedAttachments((prev) => [...prev, ...newAttachments]);
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleRemoveAttachment = (id: string) => {
-    setStagedAttachments(prev => prev.filter(a => a._id !== id));
+    setStagedAttachments((prev) => prev.filter((a) => a._id !== id));
   };
 
   const toggleRecording = () => {
@@ -76,9 +120,9 @@ export function MessageComposer() {
         messageId: "",
         url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
         type: "audio",
-        filename: `Voice Note (${recordingDuration}s).mp3`
+        filename: `Voice Note (${recordingDuration}s).mp3`,
       };
-      setStagedAttachments(prev => [...prev, mockAudio]);
+      setStagedAttachments((prev) => [...prev, mockAudio]);
       setIsRecording(false);
     } else {
       setRecordingDuration(0);
@@ -87,29 +131,34 @@ export function MessageComposer() {
   };
 
   const formatDuration = (seconds: number) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
+    const m = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
     return `${m}:${s}`;
   };
 
   const onEmojiClick = (emoji: string) => {
-    setContent(prev => prev + emoji);
+    setContent((prev) => prev + emoji);
     setShowEmojiPicker(false);
   };
 
   return (
     <div className="p-4 bg-background border-t border-border/50 relative z-10 shadow-[0_-4px_24px_rgba(0,0,0,0.02)] flex flex-col gap-2">
-
       {/* Staged Attachments Preview */}
       {stagedAttachments.length > 0 && (
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide px-2">
           {stagedAttachments.map((att) => (
-            <div key={att._id} className="relative group shrink-0 w-16 h-16 rounded-xl border border-border bg-muted/50 overflow-hidden flex items-center justify-center">
+            <div
+              key={att._id}
+              className="relative group shrink-0 w-16 h-16 rounded-xl border border-border bg-muted/50 overflow-hidden flex items-center justify-center"
+            >
               {att.type === "image" ? (
                 <Image
                   src={att.url}
                   alt={att.filename || ""}
-                  fill
+                  width={64}
+                  height={64}
                   className="object-cover"
                   unoptimized
                 />
@@ -135,11 +184,18 @@ export function MessageComposer() {
       {showEmojiPicker && (
         <div className="absolute bottom-full right-4 mb-2 bg-popover border border-border rounded-xl p-3 shadow-xl z-50 w-64 animate-in slide-in-from-bottom-2">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-semibold text-muted-foreground uppercase">Emojis</span>
-            <button onClick={() => setShowEmojiPicker(false)} className="text-muted-foreground hover:text-foreground"><X size={14} /></button>
+            <span className="text-xs font-semibold text-muted-foreground uppercase">
+              Emojis
+            </span>
+            <button
+              onClick={() => setShowEmojiPicker(false)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X size={14} />
+            </button>
           </div>
           <div className="grid grid-cols-5 gap-2">
-            {EMOJIS.map(emoji => (
+            {EMOJIS.map((emoji) => (
               <button
                 key={emoji}
                 onClick={() => onEmojiClick(emoji)}
@@ -171,8 +227,12 @@ export function MessageComposer() {
         {isRecording ? (
           <div className="flex-1 min-h-[40px] flex items-center gap-3 px-2">
             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            <span className="text-sm font-medium text-red-500">Recording Audio...</span>
-            <span className="text-sm font-mono text-muted-foreground ml-auto">{formatDuration(recordingDuration)}</span>
+            <span className="text-sm font-medium text-red-500">
+              Recording Audio...
+            </span>
+            <span className="text-sm font-mono text-muted-foreground ml-auto">
+              {formatDuration(recordingDuration)}
+            </span>
           </div>
         ) : (
           <Textarea
@@ -189,7 +249,7 @@ export function MessageComposer() {
           {!isRecording && (
             <button
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className={`p-2 rounded-xl transition-colors ${showEmojiPicker ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
+              className={`p-2 rounded-xl transition-colors ${showEmojiPicker ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
             >
               <Smile size={20} />
             </button>
@@ -197,9 +257,13 @@ export function MessageComposer() {
 
           <button
             onClick={toggleRecording}
-            className={`p-2 rounded-xl transition-all shadow-sm transform active:scale-95 ${isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-muted/50 text-foreground hover:bg-muted'}`}
+            className={`p-2 rounded-xl transition-all shadow-sm transform active:scale-95 ${isRecording ? "bg-red-500 text-white animate-pulse" : "bg-muted/50 text-foreground hover:bg-muted"}`}
           >
-            {isRecording ? <Square size={18} fill="currentColor" /> : <Mic size={18} />}
+            {isRecording ? (
+              <Square size={18} fill="currentColor" />
+            ) : (
+              <Mic size={18} />
+            )}
           </button>
 
           <button
@@ -212,7 +276,10 @@ export function MessageComposer() {
         </div>
       </div>
       <div className="text-center mt-0.5 opacity-70">
-        <p className="text-[10px] text-muted-foreground"><strong>Return</strong> to send, <strong>Shift + Return</strong> for new line</p>
+        <p className="text-[10px] text-muted-foreground">
+          <strong>Return</strong> to send, <strong>Shift + Return</strong> for
+          new line
+        </p>
       </div>
     </div>
   );
