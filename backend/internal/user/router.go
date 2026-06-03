@@ -15,6 +15,7 @@ func UserRoutes(rg *gin.RouterGroup, client *mongo.Client) {
 	userGroup := rg.Group("/users")
 	{
 		userGroup.POST("/signup", handler.CreateUserHandler)
+		userGroup.POST("/login", handler.LoginHandler)
 		userGroup.GET("/:id", handler.GetUserHandler)
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	appRouter "GoChat/cmd"
+	"GoChat/config"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -12,8 +13,13 @@ import (
 )
 
 func main() {
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// 1. Kết nối MongoDB
-	client, err := mongo.Connect(options.Client().ApplyURI("mongodb://admin:admin123@localhost:27018/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.5.10"))
+	client, err := mongo.Connect(options.Client().ApplyURI(cfg.MongoURL))
 	if err != nil {
 		log.Fatal("Lỗi kết nối MongoDB:", err)
 	}
