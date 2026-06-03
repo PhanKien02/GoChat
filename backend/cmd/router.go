@@ -1,15 +1,16 @@
-package appRouter
+package cmd
 
 import (
+	"GoChat/internal/auth"
 	"GoChat/internal/user"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 func SetUpRouter(
 	rg *gin.RouterGroup,
-	client *mongo.Client,
+	handler *Initialization,
 ) {
-	user.UserRoutes(rg, client)
+	user.UserRoutes(rg, handler.UserHandler)
+	auth.AuthRoutes(rg, handler.AuthHandler)
 }

@@ -38,7 +38,8 @@ func main() {
 
 	// 4. Tạo router group và đăng ký routes
 	api := router.Group("/api")
-	appRouter.SetUpRouter(api, client)
+	init := appRouter.NewInitialization(client)
+	appRouter.SetUpRouter(api, init)
 
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
