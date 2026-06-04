@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"GoChat/cmd"
 	appRouter "GoChat/cmd"
 	"GoChat/config"
 	"GoChat/shared/middleware"
@@ -56,6 +57,7 @@ func main() {
 	})
 	// 4. Tạo router group và đăng ký routes
 	api := router.Group("/api")
+	router.GET("/ws", cmd.SocketHandler)
 	api.Use(middleware.ErrorHandler())
 	init := appRouter.NewInitialization(client)
 	appRouter.SetUpRouter(api, init)

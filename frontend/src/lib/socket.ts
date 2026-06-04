@@ -1,41 +1,66 @@
-import { io, Socket } from 'socket.io-client';
+import { getCookie } from "./cookies";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3002';
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:8080";
 
 class SocketService {
-  private socket: Socket | null = null;
+  private socket: WebSocket | null = null;
 
   connect() {
+    if (typeof window === "undefined") return null;
+
     if (!this.socket) {
-      this.socket = io(SOCKET_URL, {
-        withCredentials: true,
-        autoConnect: true,
-        timeout: 5000,
-      });
+      const token = getCookie<string>("accessToken");
+      if (!token) {
+        console.warn("Cannot connect to WebSocket: No access token found");
+        return null;
+      }
 
-      this.socket.on('connect', () => {
-        console.log('Connected to socket server:', this.socket?.id);
-      });
+      // Convert http/https to ws/wss protocols
+      const wsProtocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      // Parse base URL for WebSocket
+      let cleanSocketUrl = SOCKET_URL.replace(/^(http|https):/, "");
+      if (!cleanSocketUrl.startsWith("//")) {
+        cleanSocketUrl = "//" + cleanSocketUrl;
+      }
+      
+      const socketUrl = `${wsProtocol}${cleanSocketUrl}/ws`;
 
-      this.socket.on('disconnect', () => {
-        console.log('Disconnected from socket server');
-      });
+      console.log("Connecting to raw WebSocket server:", socketUrl);
+      this.socket = new WebSocket(socketUrl);
 
-      this.socket.on('connect_error', (err) => {
-        console.error('Socket connection error:', err.message);
-      });
+      this.socket.onopen = () => {
+        console.log("Connected to WebSocket server successfully");
+      };
+
+      this.socket.onclose = (event) => {
+        console.log("Disconnected from WebSocket server:", event.reason);
+        this.socket = null;
+      };
+
+      this.socket.onerror = (err) => {
+        console.error("WebSocket connection error:", err);
+      };
+
+      this.socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("Received WebSocket event:", data);
+        } catch {
+          console.log("Received raw WebSocket message:", event.data);
+        }
+      };
     }
     return this.socket;
   }
 
   disconnect() {
     if (this.socket) {
-      this.socket.disconnect();
+      this.socket.close();
       this.socket = null;
     }
   }
 
-  getSocket(): Socket | null {
+  getSocket(): WebSocket | null {
     return this.socket;
   }
 }
