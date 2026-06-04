@@ -1,0 +1,27 @@
+info:
+  name: get all user
+  type: http
+  seq: 4
+
+http:
+  method: get
+  url: "{{BASE_URL}}/users?searchKeyword=soi&page=1&limit"
+  params:
+    - name: searchKeyword
+      value: soi
+      type: query
+    - name: page
+      value: "1"
+      type: query
+    - name: limit
+      value: ""
+      type: query
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODA2NzY4MTIsImlhdCI6MTc4MDU5MDQxMiwidXNlcl9pZCI6IjZhMjAzMDI4NDA4YjU5MDA5ZmMzMjM1NyJ9.MgTRt5OyFxXRdDEu48gWPPE3C7Upnmb56avdnSX-S3E
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

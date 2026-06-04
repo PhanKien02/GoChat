@@ -4,6 +4,7 @@ import (
 	"GoChat/shared/helper"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -43,6 +44,7 @@ func ValidateToken(tokenString string) (*jwt.Token, error) {
 			return nil, fmt.Errorf("unexpected signing method")
 		}
 
-		return "jwtKey", nil
+		secret := os.Getenv("ACCESS_TOKEN_SECRET")
+		return []byte(secret), nil
 	})
 }

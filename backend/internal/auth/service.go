@@ -5,6 +5,7 @@ import (
 	"GoChat/internal/user"
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -68,15 +69,35 @@ func (auth *authService) Login(ctx context.Context, req *LoginRequest) (*LoginRe
 	return loginResp, refreshToken, nil
 }
 
+func parseDuration(d string) time.Duration {
+	if len(d) > 1 && d[len(d)-1] == 'd' {
+		// Convert e.g. "1d" to hours: "24h"
+		var days int
+		_, err := fmt.Sscanf(d, "%dd", &days)
+		if err == nil {
+			return time.Duration(days) * 24 * time.Hour
+		}
+	}
+	val, err := time.ParseDuration(d)
+	if err == nil {
+		return val
+	}
+	return 24 * time.Hour // fallback
+}
+
 func generateToken(userID string, typeToken string) (string, error) {
 	cfg, _ := config.Load()
 	screctKey := []byte(cfg.AccessTokenSecret)
+	durationStr := cfg.AccessTokenExpire
+
 	if typeToken == "refresh" {
 		screctKey = []byte(cfg.RefreshTokenSecret)
+		durationStr = cfg.RefreshTokenExpire
 	}
+
 	claims := jwt.MapClaims{
 		"user_id": userID,
-		"exp":     cfg.AccessTokenExpire,
+		"exp":     time.Now().Add(parseDuration(durationStr)).Unix(),
 		"iat":     time.Now().Unix(),
 	}
 
