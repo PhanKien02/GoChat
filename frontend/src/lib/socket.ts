@@ -10,7 +10,7 @@ class SocketService {
       this.socket = io(SOCKET_URL, {
         withCredentials: true,
         autoConnect: true,
-        // transports: ['websocket'], // Uncomment if you only want to use WebSockets
+        timeout: 5000,
       });
 
       this.socket.on('connect', () => {
