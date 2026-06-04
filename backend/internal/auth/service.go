@@ -67,20 +67,29 @@ func (auth *authService) Login(ctx context.Context, req *LoginRequest) (*LoginRe
 	}
 	return loginResp, refreshToken, nil
 }
-
 func generateToken(userID string, typeToken string) (string, error) {
 	cfg, _ := config.Load()
-	screctKey := []byte(cfg.AccessTokenSecret)
-	if typeToken == "refresh" {
-		screctKey = []byte(cfg.RefreshTokenSecret)
+	var jwtSecret []byte
+	if typeToken == "access" {
+		jwtSecret = []byte(cfg.AccessTokenSecret)
+	} else {
+		jwtSecret = []byte(cfg.RefreshTokenSecret)
 	}
 	claims := jwt.MapClaims{
-		"user_id": userID,
-		"exp":     cfg.AccessTokenExpire,
-		"iat":     time.Now().Unix(),
+		"sub":  userID,                                // Subject (User ID)
+		"role": "user",                                // Custom claim
+		"iat":  time.Now().Unix(),                     // Issued at
+		"exp":  time.Now().Add(time.Hour * 24).Unix(), // Expiration time (e.g., 24 hours)
 	}
 
+	// 2. Create the token object with the chosen signing method and claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(screctKey))
+	// 3. Sign the token using your secret key
+	tokenString, err := token.SignedString(jwtSecret)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
