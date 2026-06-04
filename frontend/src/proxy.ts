@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 export function proxy(request: NextRequest) {
   // TODO: Replace 'auth-token' with your actual authentication cookie/token name
   // This could be from next-auth, firebase, or a custom backend token
-  const hasAuthToken = request.cookies.has('auth-token');
+  const hasAuthToken = request.cookies.has('accessToken');
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/signup');
 
   // If the user is NOT authenticated and trying to access a protected route

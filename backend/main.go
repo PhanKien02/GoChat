@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
 	appRouter "GoChat/cmd"
 	"GoChat/config"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -35,7 +37,14 @@ func main() {
 
 	// 3. Khởi tạo Gin Router
 	router := gin.Default()
-
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	// 4. Tạo router group và đăng ký routes
 	api := router.Group("/api")
 	init := appRouter.NewInitialization(client)

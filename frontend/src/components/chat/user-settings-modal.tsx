@@ -9,9 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Settings, User, Key, Moon, Sun, Monitor, Link2, LogOut } from "lucide-react";
 import { useTheme } from "next-themes";
-import { mockLogout } from "@/app/actions/auth";
+import { removeCookie } from "@/lib/cookies";
+import { useRouter } from "next/navigation";
 
 export function UserSettingsModal() {
+  const router = useRouter()
   const { isUserSettingsOpen, toggleUserSettings } = useChatStore();
   const currentUser = useAuthStore(state => state.user);
   const { updateProfile, toggleSpotify } = useProfileStore();
@@ -29,10 +31,16 @@ export function UserSettingsModal() {
   };
 
   const handleSavePassword = () => {
+    toggleUserSettings(false)
     setCurrentPassword("");
     setNewPassword("");
   };
 
+  const handleLogout = () => {
+    removeCookie("accessToken")
+    removeCookie("user")
+    router.replace("/login")
+  }
   // Re-sync local state when modal opens
   if (!isUserSettingsOpen || !currentUser) return null;
 
@@ -42,29 +50,29 @@ export function UserSettingsModal() {
         {/* Sidebar Navigation */}
         <div className="w-[240px] bg-sidebar border-r border-border p-4 flex flex-col gap-1.5 shrink-0">
           <h3 className="font-semibold text-[11px] uppercase tracking-wider text-muted-foreground mb-3 px-3 pt-2">User Settings</h3>
-          
-          <button 
+
+          <button
             onClick={() => setActiveTab("account")}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === "account" ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted text-foreground/80 hover:text-foreground"}`}
           >
             <User size={16} /> My Account
           </button>
-          
-          <button 
+
+          <button
             onClick={() => setActiveTab("password")}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === "password" ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted text-foreground/80 hover:text-foreground"}`}
           >
             <Key size={16} /> Password & Security
           </button>
-          
-          <button 
+
+          <button
             onClick={() => setActiveTab("appearance")}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === "appearance" ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted text-foreground/80 hover:text-foreground"}`}
           >
             <Settings size={16} /> Appearance
           </button>
 
-          <button 
+          <button
             onClick={() => setActiveTab("connections")}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${activeTab === "connections" ? "bg-primary text-primary-foreground shadow-sm" : "hover:bg-muted text-foreground/80 hover:text-foreground"}`}
           >
@@ -72,20 +80,19 @@ export function UserSettingsModal() {
           </button>
 
           <div className="mt-auto pt-4 mb-2">
-            <form action={mockLogout}>
-              <button 
-                type="submit"
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-red-500 hover:bg-red-500/10 hover:text-red-600"
-              >
-                <LogOut size={16} /> Log Out
-              </button>
-            </form>
+            <button
+              type="submit"
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-red-500 hover:bg-red-500/10 hover:text-red-600"
+            >
+              <LogOut size={16} /> Log Out
+            </button>
           </div>
         </div>
 
         {/* Main Content Area */}
         <div className="flex-1 bg-card overflow-y-auto p-8 relative">
-          <button 
+          <button
             onClick={() => toggleUserSettings(false)}
             className="absolute top-4 right-4 p-2 text-muted-foreground hover:bg-muted rounded-full transition-colors"
           >
@@ -113,21 +120,21 @@ export function UserSettingsModal() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="space-y-5">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-foreground">Display Name</label>
-                  <Input 
-                    value={username} 
-                    onChange={e => setUsername(e.target.value)} 
+                  <Input
+                    value={username}
+                    onChange={e => setUsername(e.target.value)}
                     className="bg-background max-w-sm h-11"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-foreground">Bio</label>
-                  <Textarea 
-                    value={bio} 
-                    onChange={e => setBio(e.target.value)} 
+                  <Textarea
+                    value={bio}
+                    onChange={e => setBio(e.target.value)}
                     placeholder="Tell us about yourself..."
                     className="resize-none bg-background min-h-[100px]"
                   />
@@ -146,29 +153,29 @@ export function UserSettingsModal() {
                 <h2 className="text-2xl font-bold tracking-tight mb-2">Change Password</h2>
                 <p className="text-sm text-muted-foreground">Update your password to keep your account secure.</p>
               </div>
-              
+
               <div className="space-y-5 max-w-sm">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-foreground">Current Password</label>
-                  <Input 
-                    type="password" 
-                    value={currentPassword} 
-                    onChange={e => setCurrentPassword(e.target.value)} 
+                  <Input
+                    type="password"
+                    value={currentPassword}
+                    onChange={e => setCurrentPassword(e.target.value)}
                     className="bg-background h-11"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-foreground">New Password</label>
-                  <Input 
-                    type="password" 
-                    value={newPassword} 
-                    onChange={e => setNewPassword(e.target.value)} 
+                  <Input
+                    type="password"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
                     className="bg-background h-11"
                   />
                 </div>
                 <div className="pt-4 border-t border-border mt-6">
-                  <Button 
-                    onClick={handleSavePassword} 
+                  <Button
+                    onClick={handleSavePassword}
                     disabled={!currentPassword || !newPassword}
                     className="h-10 px-6"
                   >
@@ -185,25 +192,25 @@ export function UserSettingsModal() {
                 <h2 className="text-2xl font-bold tracking-tight mb-2">Appearance</h2>
                 <p className="text-sm text-muted-foreground">Customize the look and feel of the application.</p>
               </div>
-              
+
               <div className="space-y-4">
                 <label className="text-sm font-semibold text-foreground block">Theme</label>
                 <div className="grid grid-cols-3 gap-4">
-                  <button 
+                  <button
                     onClick={() => setTheme("light")}
                     className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] ${theme === "light" ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/30 bg-card text-muted-foreground"}`}
                   >
                     <Sun size={28} />
                     <span className="text-sm font-medium">Light</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => setTheme("dark")}
                     className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] ${theme === "dark" ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/30 bg-card text-muted-foreground"}`}
                   >
                     <Moon size={28} />
                     <span className="text-sm font-medium">Dark</span>
                   </button>
-                  <button 
+                  <button
                     onClick={() => setTheme("system")}
                     className={`flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 transition-all hover:scale-[1.02] active:scale-[0.98] ${theme === "system" ? "border-primary bg-primary/5 text-primary" : "border-border hover:border-primary/30 bg-card text-muted-foreground"}`}
                   >
@@ -221,7 +228,7 @@ export function UserSettingsModal() {
                 <h2 className="text-2xl font-bold tracking-tight mb-2">Connections</h2>
                 <p className="text-sm text-muted-foreground">Connect your accounts to unlock special integrations.</p>
               </div>
-              
+
               <div className="space-y-4 max-w-lg">
                 <div className="flex items-center justify-between p-5 rounded-2xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-center gap-4">

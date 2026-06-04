@@ -58,8 +58,24 @@ export interface Conversation {
   };
 }
 
+export interface ILoginRequest {
+  login: string;
+  password: string;
+}
+
+export interface ILoginResponse {
+  user: User;
+  accessToken: string;
+}
+
+export interface IRegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+}
 export interface IResponse<T> {
-  success: boolean;
+  isSuccess: boolean;
   message: string;
+  code: number,
   data: T;
 }

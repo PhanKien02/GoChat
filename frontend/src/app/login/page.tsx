@@ -1,12 +1,26 @@
+'use client'
+
 import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { mockLogin } from "@/app/actions/auth";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string, success?: string }> }) {
-  const { error, success } = await searchParams;
-
+export default function LoginPage() {
+  const { error, login } = useAuthStore()
+  const router = useRouter()
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const credentials = {
+      login: formData.get("email") as string,
+      password: formData.get("password") as string
+    }
+    await login(credentials).then(() => {
+      router.replace("/");
+    })
+  }
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background text-foreground overflow-hidden relative selection:bg-primary/20">
 
@@ -30,17 +44,13 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </div>
 
         <div className="bg-card/50 backdrop-blur-xl border border-border p-6 sm:p-8 rounded-2xl shadow-2xl shadow-black/5">
-          {error === "not_found" && (
+          {error && (
             <div className="p-3 mb-4 text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg text-center font-medium">
-              Account not found. Please use an email from the mock data.
+              {error}
             </div>
           )}
-          {success === "registered" && (
-            <div className="p-3 mb-4 text-sm text-green-500 bg-green-500/10 border border-green-500/20 rounded-lg text-center font-medium">
-              Account created successfully! Please sign in.
-            </div>
-          )}
-          <form action={mockLogin} className="space-y-4">
+
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="email" className="text-xs font-medium text-foreground/80 pl-1">
                 Email address

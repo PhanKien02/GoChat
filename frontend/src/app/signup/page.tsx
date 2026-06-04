@@ -1,10 +1,35 @@
+"use client";
+
 import Link from "next/link";
 import { MessageSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { mockSignup } from "@/app/actions/auth";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/authStore";
 
 export default function SignupPage() {
+  const router = useRouter();
+  const { register } = useAuthStore()
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    const confirmPassword = formData.get('confirm-password') as string
+    const password = formData.get('password') as string
+    if (confirmPassword !== password) {
+      alert("Password and confirm password must be the same")
+      return
+    }
+    const credentials = {
+      email: formData.get("email") as string,
+      password: password,
+      username: formData.get("name") as string,
+    }
+    await register(credentials).then(() => {
+      router.replace("/");
+    }).catch((error) => {
+      console.error(error);
+    })
+  }
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background text-foreground overflow-hidden relative selection:bg-primary/20">
 
@@ -28,7 +53,7 @@ export default function SignupPage() {
         </div>
 
         <div className="bg-card/50 backdrop-blur-xl border border-border p-6 sm:p-8 rounded-2xl shadow-2xl shadow-black/5">
-          <form action={mockSignup} className="space-y-4">
+          <form onSubmit={handleSignUp} className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="name" className="text-xs font-medium text-foreground/80 pl-1">
                 Full Name
@@ -119,7 +144,7 @@ export default function SignupPage() {
         </div>
 
         <p className="mt-8 text-center text-sm text-muted-foreground">
-          Already have an account? 
+          Already have an account?
           <Link href="/login" className="text-foreground font-medium hover:underline underline-offset-4 ml-1">
             Sign in
           </Link>

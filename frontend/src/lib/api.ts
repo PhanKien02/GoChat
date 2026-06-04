@@ -1,43 +1,43 @@
-import axios from 'axios';
-import { useChatStore } from '@/store/chatStore';
+"use client";
+import axios from "axios";
+// import { cookies } from "next/headers";
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002/api',
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const TIMEOUT = 10000;
+// const cookieStore = await cookies();
+const baseRequest = axios.create({
+  baseURL: BASE_URL,
+  timeout: TIMEOUT, // Thời gian chờ (ms)
+
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-  withCredentials: true, // Send cookies when cross-domain requests
+  withCredentials: true,
+
 });
 
-// Add a request interceptor
-api.interceptors.request.use(
-  (config) => {
-    // You can attach tokens from localStorage here if needed,
-    // though HttpOnly cookies (withCredentials: true) are better.
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+baseRequest.interceptors.request.use(
+  async config => {
+    // const token = cookieStore.get("access_token");
+    // config.headers["Authorization"] = `Bearer ${token}`;
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  error => Promise.reject(error || "Có lỗi hệ thống vui lòng thử lại")
 );
-
-// Add a response interceptor
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Handle global errors (e.g., 401 Unauthorized -> redirect to login)
-    if (error.response?.status === 401) {
-      if (typeof window !== 'undefined') {
-        useChatStore.getState().clearStore();
-        window.location.href = '/login';
-      }
+baseRequest.interceptors.response.use(
+  res => res,
+  async error => {
+    const originalRequest = error.config;
+    if (!error.response) {
+      return Promise.reject(error.response?.data || "Something went wrong");
     }
-    return Promise.reject(error);
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      return baseRequest(originalRequest);
+    }
+    return Promise.reject(error.response?.data || "Something went wrong");
   }
 );
 
-export default api;
+export default baseRequest;

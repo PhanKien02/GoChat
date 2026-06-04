@@ -21,6 +21,6 @@ type UserInfo struct {
 }
 
 type LoginResponse struct {
-	AccessToken string `json:"access_token" binding:"required"`
-	UserInfo    *UserInfo
+	AccessToken string    `json:"accessToken" binding:"required"`
+	UserInfo    *UserInfo `json:"user" binding:"required"`
 }
