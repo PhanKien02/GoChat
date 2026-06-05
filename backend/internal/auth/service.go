@@ -5,6 +5,7 @@ import (
 	"GoChat/internal/user"
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -67,26 +68,44 @@ func (auth *authService) Login(ctx context.Context, req *LoginRequest) (*LoginRe
 	}
 	return loginResp, refreshToken, nil
 }
+
+func parseDuration(d string) time.Duration {
+	if len(d) > 1 && d[len(d)-1] == 'd' {
+		// Convert e.g. "1d" to hours: "24h"
+		var days int
+		_, err := fmt.Sscanf(d, "%dd", &days)
+		if err == nil {
+			return time.Duration(days) * 24 * time.Hour
+		}
+	}
+	val, err := time.ParseDuration(d)
+	if err == nil {
+		return val
+	}
+	return 24 * time.Hour // fallback
+}
+
 func generateToken(userID string, typeToken string) (string, error) {
 	cfg, _ := config.Load()
-	var jwtSecret []byte
-	if typeToken == "access" {
-		jwtSecret = []byte(cfg.AccessTokenSecret)
-	} else {
-		jwtSecret = []byte(cfg.RefreshTokenSecret)
+	screctKey := []byte(cfg.AccessTokenSecret)
+	durationStr := cfg.AccessTokenExpire
+
+	if typeToken == "refresh" {
+		screctKey = []byte(cfg.RefreshTokenSecret)
+		durationStr = cfg.RefreshTokenExpire
 	}
+
 	claims := jwt.MapClaims{
-		"sub":  userID,                                // Subject (User ID)
-		"role": "user",                                // Custom claim
-		"iat":  time.Now().Unix(),                     // Issued at
-		"exp":  time.Now().Add(time.Hour * 24).Unix(), // Expiration time (e.g., 24 hours)
+		"user_id": userID,
+		"exp":     time.Now().Add(parseDuration(durationStr)).Unix(),
+		"iat":     time.Now().Unix(),
 	}
 
 	// 2. Create the token object with the chosen signing method and claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// 3. Sign the token using your secret key
-	tokenString, err := token.SignedString(jwtSecret)
+	tokenString, err := token.SignedString(screctKey)
 	if err != nil {
 		return "", err
 	}

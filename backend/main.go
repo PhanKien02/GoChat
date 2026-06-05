@@ -3,10 +3,13 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"time"
 
+	"GoChat/cmd"
 	appRouter "GoChat/cmd"
 	"GoChat/config"
+	"GoChat/shared/middleware"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -45,8 +48,17 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{
+			"code":      http.StatusNotFound,
+			"isSuccess": false,
+			"message":   "route not found",
+		})
+	})
 	// 4. Tạo router group và đăng ký routes
 	api := router.Group("/api")
+	router.GET("/ws", cmd.SocketHandler)
+	api.Use(middleware.ErrorHandler())
 	init := appRouter.NewInitialization(client)
 	appRouter.SetUpRouter(api, init)
 
@@ -56,5 +68,5 @@ func main() {
 		})
 	})
 
-	router.Run() // listens on 0.0.0.0:8080 by default
+	router.Run()
 }

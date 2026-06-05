@@ -4,6 +4,7 @@ import (
 	"GoChat/config"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -63,4 +64,15 @@ func JWTMiddleware() gin.HandlerFunc {
 		// 6. Continue to the next handler
 		c.Next()
 	}
+}
+func ValidateToken(tokenString string) (*jwt.Token, error) {
+	return jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
+
+		secret := os.Getenv("ACCESS_TOKEN_SECRET")
+		return []byte(secret), nil
+	})
 }

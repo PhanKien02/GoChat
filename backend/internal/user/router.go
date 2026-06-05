@@ -11,5 +11,6 @@ func UserRoutes(rg *gin.RouterGroup, handler *UserHandler) {
 	userGroup.Use(middleware.JWTMiddleware())
 	{
 		userGroup.GET("/:id", handler.GetUserHandler)
+		userGroup.GET("/", handler.GetAllUserHandler)
 	}
 }

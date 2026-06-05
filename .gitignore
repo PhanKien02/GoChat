@@ -1,2 +1,3 @@
 /.agent
 /backend/.env
+/backend/tmp
