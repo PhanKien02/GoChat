@@ -14,7 +14,7 @@ type UserService interface {
 	GetUserByEmail(ctx context.Context, email string) (*UserModel, error)
 	UpdateUser(ctx context.Context, id string, user *UserModel) error
 	DeleteUser(ctx context.Context, id string) error
-	GetAllUser(ctx context.Context, query GetAllUserQuery) (*[]UserModel, error)
+	GetAllUser(ctx context.Context, userId string, query GetAllUserQuery) (*[]UserModel, error)
 }
 
 type userService struct {
@@ -72,6 +72,6 @@ func (s *userService) DeleteUser(ctx context.Context, id string) error {
 	return s.repo.DeleteUser(ctx, userId)
 }
 
-func (s *userService) GetAllUser(ctx context.Context, query GetAllUserQuery) (*[]UserModel, error) {
-	return s.repo.GetAllUser(ctx, query)
+func (s *userService) GetAllUser(ctx context.Context, userId string, query GetAllUserQuery) (*[]UserModel, error) {
+	return s.repo.GetAllUser(ctx, userId, query)
 }

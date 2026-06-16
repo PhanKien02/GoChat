@@ -159,7 +159,19 @@ export function NewChatModal() {
 
                                 {/* User List */}
                                 <div className="h-70 overflow-y-auto p-2 scrollbar-hide">
-                                        {availableUsers.length === 0 ? (
+                                        {isFetching ? (
+                                                <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
+                                                        <p className="text-sm">
+                                                                Loading users...
+                                                        </p>
+                                                </div>
+                                        ) : fetchError ? (
+                                                <div className="h-full flex flex-col items-center justify-center text-red-500">
+                                                        <p className="text-sm">
+                                                                {fetchError}
+                                                        </p>
+                                                </div>
+                                        ) : availableUsers.length === 0 ? (
                                                 <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
                                                         <p className="text-sm">
                                                                 No users found

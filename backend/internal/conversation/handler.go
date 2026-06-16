@@ -2,6 +2,7 @@ package conversation
 
 import (
 	"GoChat/shared/helper"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -49,24 +50,9 @@ func (h *ConversationHandler) GetAllConversations(ctx *gin.Context) {
 	}
 
 	// Extract user ID from context (set by JWT middleware). The stored value may be a string or numeric.
-	uidVal, ok := ctx.Get("userID")
+	userId, ok := ctx.Get("userID")
 	if !ok {
 		helper.ErrorResponse(ctx, http.StatusUnauthorized, "unauthorized")
-		return
-	}
-
-	var userId string
-	switch v := uidVal.(type) {
-	case string:
-		userId = v
-	case float64:
-		userId = strconv.FormatInt(int64(v), 10)
-	case int:
-		userId = strconv.Itoa(v)
-	case int64:
-		userId = strconv.FormatInt(v, 10)
-	default:
-		helper.ErrorResponse(ctx, http.StatusInternalServerError, "invalid user id type")
 		return
 	}
 
@@ -74,7 +60,7 @@ func (h *ConversationHandler) GetAllConversations(ctx *gin.Context) {
 	query.Page, _ = strconv.Atoi(ctx.Query("page"))
 	query.Limit, _ = strconv.Atoi(ctx.Query("limit"))
 
-	convs, err := h.service.GetAllConversations(ctx.Request.Context(), userId, query)
+	convs, err := h.service.GetAllConversations(ctx.Request.Context(), fmt.Sprintf("%v", userId), query)
 	if err != nil {
 		helper.ErrorResponse(ctx, http.StatusBadRequest, err.Error())
 		return

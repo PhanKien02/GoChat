@@ -15,7 +15,7 @@ type UserRepository interface {
 	GetUserByID(ctx context.Context, id bson.ObjectID) *UserModel
 	GetUserByEmail(ctx context.Context, email string) *UserModel
 	UpdateUser(ctx context.Context, id bson.ObjectID, user *UserModel) error
-	GetAllUser(ctx context.Context, query GetAllUserQuery) (*[]UserModel, error)
+	GetAllUser(ctx context.Context, userId string, query GetAllUserQuery) (*[]UserModel, error)
 	DeleteUser(ctx context.Context, id bson.ObjectID) error
 }
 
@@ -73,17 +73,24 @@ func (r *userRepository) DeleteUser(ctx context.Context, id bson.ObjectID) error
 	return err
 }
 
-func (r *userRepository) GetAllUser(ctx context.Context, query GetAllUserQuery) (*[]UserModel, error) {
+func (r *userRepository) GetAllUser(ctx context.Context, userId string, query GetAllUserQuery) (*[]UserModel, error) {
 	var users []UserModel
 	filter := bson.M{}
+	_id, err := bson.ObjectIDFromHex(userId)
+	if err != nil {
+		return nil, err
+	}
 	if query.SearchKeyword != "" {
 		filter = bson.M{
 			"$text": bson.M{
 				"$search": query.SearchKeyword,
 			},
+			"_id": bson.M{"$ne": _id},
 		}
+	} else {
+		filter = bson.M{"_id": bson.M{"$ne": _id}}
 	}
-	fmt.Print(filter, query)
+	fmt.Println("filter", filter)
 	opts := options.Find()
 	if query.SearchKeyword != "" {
 		opts.SetSort(bson.D{{Key: "score", Value: bson.M{"$meta": "textScore"}}})
