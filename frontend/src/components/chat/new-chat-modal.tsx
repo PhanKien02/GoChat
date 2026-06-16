@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useChatStore } from "@/store/chatStore";
 import { useAuthStore } from "@/store/authStore";
@@ -6,7 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Check, X } from "lucide-react";
-import { users } from "@/lib/data";
+// import { users } from "@/lib/data";
+import api from "@/lib/api";
 import { User } from "@/lib/types";
 
 export function NewChatModal() {
@@ -15,11 +16,41 @@ export function NewChatModal() {
         const currentUser = useAuthStore((state) => state.user);
         const [searchQuery, setSearchQuery] = useState("");
         const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+        const [allUsers, setAllUsers] = useState<User[]>([]);
+        const [isFetching, setIsFetching] = useState(false);
+        const [fetchError, setFetchError] = useState<string | null>(null);
+
+        useEffect(() => {
+                const fetchUsers = async () => {
+                        setIsFetching(true);
+                        try {
+                                const res = await api.get("/users");
+                                // Some backends wrap data in {data: T}. Handle both cases.
+                                const data: User[] = res.data?.data || res.data;
+                                setAllUsers(data || []);
+                                setFetchError(null);
+                        } catch (err) {
+                                console.error(err);
+                                setFetchError(
+                                        err instanceof Error
+                                                ? err.message
+                                                : "Failed to fetch users",
+                                );
+                        } finally {
+                                setIsFetching(false);
+                        }
+                };
+
+                // Fetch users only once when modal mounts
+                if (isNewChatModalOpen) {
+                        fetchUsers();
+                }
+        }, [isNewChatModalOpen]);
 
         if (!isNewChatModalOpen || !currentUser) return null;
 
         // Filter out the current user and search query
-        const availableUsers = users.filter(
+        const availableUsers = allUsers.filter(
                 (u) =>
                         u._id !== currentUser._id &&
                         u.username
