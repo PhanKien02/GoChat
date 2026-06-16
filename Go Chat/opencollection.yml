@@ -19,7 +19,7 @@ request:
     - name: BASE_URL
       value: http://localhost:8080/api
     - name: token
-      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOiIxZCIsImlhdCI6MTc4MDU4NzcwMiwidXNlcl9pZCI6IjZhMjAzMDI4NDA4YjU5MDA5ZmMzMjM1NyJ9.5yk4k7Er8J4KtxfWhEhFhEQRFvvKtJj6BDTFsG2ogqw
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODE2NjIxNTMsImlhdCI6MTc4MTU3NTc1MywidXNlcl9pZCI6IjZhMzBiMDM0ODc4NDY2YTU2ZmM3MTY3ZCJ9.Cfof4eqZi3UnjO0eLtTfVEL23i7xvZR7iskSq4lkSho
 bundled: false
 extensions:
   bruno:

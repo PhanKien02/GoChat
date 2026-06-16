@@ -1,0 +1,27 @@
+info:
+  name: "Get conversation "
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: '{{BASE_URL}}/conversations/?page=1&limit=10&searchKeyword="'
+  params:
+    - name: page
+      value: "1"
+      type: query
+    - name: limit
+      value: "10"
+      type: query
+    - name: searchKeyword
+      value: '"'
+      type: query
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

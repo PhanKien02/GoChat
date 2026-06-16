@@ -56,9 +56,7 @@ func JWTMiddleware() gin.HandlerFunc {
 
 		// 5. (Optional) Extract claims and set them in the context for later use
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			fmt.Println("claims: ", claims)
-			c.Set("userID", claims["sub"]) // Assuming 'sub' holds the user ID
-			c.Set("userRole", claims["role"])
+			c.Set("userID", claims["user_id"]) // Assuming 'sub' holds the user ID
 		}
 
 		// 6. Continue to the next handler
